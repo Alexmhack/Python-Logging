@@ -137,4 +137,163 @@ WARNING:root:Warning will get logged to file
 The log info is shown in console and not been appended in file
 
 # Formatting The Output
+Logging can accept any string as a message and log it but you it also has so many
+more variables already with it, you can log the process id using
 
+**format_output.py**
+```
+import logging
+
+logging.basicConfig(format='%(process)s - %(levelname)s - %(message)s')
+logging.warning("This is a warning")
+```
+
+Run the file and you should see the process id in console.
+
+```
+1304 - WARNING - This is a warning
+```
+
+The entire list of available variables can be found [here](https://docs.python.org/3/library/logging.html#logrecord-attributes)
+
+For example we can use ```asctime``` to log the date and time when [logRecord](https://docs.python.org/3/library/logging.html#logging.LogRecord) was
+created
+
+```
+# using asctime
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
+```
+
+```asctime``` is human readable format of time which is preferred over 
+```created``` which returns in ```time.time()``` format
+
+```
+# using created
+logging.basicConfig(format='%(created)s - %(levelname)s - %(message)s')
+
+# Result
+1536984287.9202418 - WARNING - This is a warning
+```
+
+Well ```asctime``` has a nice format but you can even change that using 
+```datefmt``` like this
+
+**format_output.py**
+```
+import logging
+
+logging.basicConfig(
+	format='%(asctime)s - %(levelname)s - %(message)s',
+	datefmt='%d-%b-%y %H:%M:%S'
+)
+logging.warning("Admin logged in")
+```
+
+```
+15-Sep-18 09:38:23 - WARNING - Admin logged in
+```
+
+Some more options that I found useful are ```lineno```
+
+```
+import logging
+
+logging.basicConfig(
+	format='%(asctime)s - %(levelname)s - %(message)s - %(lineno)s',
+	datefmt='%d-%b-%y %H:%M:%S'
+)
+logging.warning("Admin logged in")
+```
+
+```
+# RESULT
+15-Sep-18 09:41:54 - WARNING - Admin logged in - 7
+```
+
+and ```pathname```
+
+```
+import logging
+
+logging.basicConfig(
+	format='%(asctime)s - %(levelname)s - %(message)s - %(pathname)s',
+	datefmt='%d-%b-%y %H:%M:%S'
+)
+logging.warning("Admin logged in")
+```
+
+```
+# RESULT
+15-Sep-18 09:40:27 - WARNING - Admin logged in - format_output.py
+```
+
+```pathname``` gives the path of the file or if you just want the module you can
+use ```module``` which gives ```format_output``` as result.
+
+```lineno``` gives the number of souce code from which log has occured.
+
+# Logging Variable Data
+You can also log the information dynamically using string formatting with log call
+
+**log_variables.py**
+```
+import logging
+
+name = "Alex"
+
+logging.warning(f"{name} is causing some issues")
+```
+
+```
+WARNING:root:Alex is causing some issues
+```
+
+# Capturing Stack Traces
+Logging module also has features to log full stack information from your app.
+Exception information can be captured if ```exc_info``` is set to ```True```
+and logging functions are called like this
+
+```
+import logging 
+
+a = 'logger'
+b = 0
+
+try:
+	b = int(a)
+except Exception as e:
+	logging.error("Exception Occured", exc_info=True)
+```
+
+```
+ERROR:root:Exception Occured
+Traceback (most recent call last):
+  File "capture_exc.py", line 7, in <module>
+    b = int(a)
+ValueError: invalid literal for int() with base 10: 'logger'
+```
+
+This is much more useful info as compared to ```ERROR:root:Exception Occured```
+
+A more precise way to log exceptions is using ```exception``` with logging
+
+```
+import logging
+
+a = 'logger'
+b = 0
+
+try:
+	b = int(a)
+except Exception as e:
+	logging.exception("Exception Occured")
+```
+
+```logging.exception("Exception Occured")``` is equivalent to 
+```logging.error("Exception Occured", exc_info=True)``` and ```exception``` shows
+log at ```ERROR``` level. You can also use any other level by calling the level 
+with ```exc_info=True``` passed as argument.
+
+```
+logging.debug("Exception Occured", exc_info=True)
+```
