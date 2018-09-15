@@ -333,3 +333,141 @@ logger = logging.getLogger(__name__)
 Just like we did before, create a custom logger using ```getLogger``` and pass it
 the ```__name__``` keyword that python assigns with the file name. Which means
 we are giving our logger the name of the file.
+
+The next thing we need to do is create handlers for logger
+
+```
+logger = logging.getLogger(__name__)
+
+c_handler = logging.StreamHandler()
+f_handler = logging.FileHandler('file.log')
+```
+
+```StreamHandler``` will handle the logs for console whereas ```FileHandler``` 
+takes in a file path as argument as logs the messages in the file.
+
+```
+c_handler.setLevel(logging.WARNING)
+f_handler.setLevel(logging.ERROR)
+```
+
+Next we set the levels at which each handler is avoked, so ```c_handler``` will log
+messages when the log level is **WARNING** and ```f_handler``` will log messages
+when the log level is **ERROR**
+
+```
+c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+```
+
+This way we tell our handlers how to log the messages but we haven't set those 
+formatters to work with handlers
+
+```
+c_handler.setFormatter(c_format)
+f_format.setFormatter(f_format)
+```
+
+Finally we will set the handlers to our logger
+
+```
+logger.addHandler(c_handler)
+logger.addHandler(f_handler)
+```
+
+Okay let's test our logger
+
+```
+logger.warning("This is a warning")
+logger.error("This is a warning")
+```
+
+```
+__main__ - WARNING - This is a warning
+__main__ - ERROR - This is a warning
+```
+
+A new file ```file.log``` is created with the message for error we defined in f_
+handler.
+
+```__main__``` is the name of the module since we run the same module but if you
+import this module in another python file then you will get the module name 
+instead of ```__main__```
+
+**import_logger.py**
+```
+import custom_logger
+```
+
+run the file ```import_logger.py``` and the results will be
+
+```
+custom_logger - WARNING - This is a warning
+custom_logger - ERROR - This is a warning
+```
+
+# Configuration Methods
+All of the above method is nice but there are other methods like loading logger
+from a config file using ```fileConfig()``` and ```dictConfig()```
+
+Create a new file named 
+
+**sample_config.conf**
+```
+[loggers]
+keys=root,sampleLogger
+
+[handlers]
+keys=consoleHandler
+
+[formatters]
+keys=sampleFormatter
+
+[logger_root]
+level=DEBUG
+handlers=consoleHandler
+
+[logger_sampleLogger]
+level=DEBUG
+handlers=consoleHandler
+qualname=sampleLogger
+propagate=0
+
+[handler_consoleHandler]
+class=StreamHandler
+level=DEBUG
+formatter=sampleFormatter
+args=(sys.stdout,)
+
+[formatter_sampleFormatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+```
+
+In the above file, there are two loggers, one handler, and one formatter. After 
+their names are defined, they are configured by adding the words logger, handler, 
+and formatter before their names separated by an underscore.
+
+To load this config file, you have to use fileConfig():
+
+**load_config.py**
+```
+import logging
+import logging.config
+
+logging.config.fileConfig(fname='sample_config.conf',
+disable_existing_loggers=False)
+
+# get the logger specified in the file
+logger = logging.getLogger(__name__)
+
+logger.debug('This is a debug log message')
+```
+
+run this file 
+
+```
+2018-09-15 11:17:34,980 - __main__ - DEBUG - This is a debug log message
+```
+
+Fore more information on loading loggers from different file formats visit 
+the [source](https://realpython.com/python-logging/)
