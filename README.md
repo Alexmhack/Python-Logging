@@ -297,3 +297,39 @@ with ```exc_info=True``` passed as argument.
 ```
 logging.debug("Exception Occured", exc_info=True)
 ```
+
+# Classes And Logging
+Till now we have just used logging in simplest and not effiecient way possible. 
+But the recommended way is to create your own logger by creating an object of 
+Logger class.
+
+The most commonly used classes in logging module are 
+
+1. **Logger**: This is the class whose objects will be used in the application code directly to call the functions.
+
+2. **LogRecord**: Loggers automatically create LogRecord objects that have all the information related to the event being logged, like the name of the logger, the function, the line number, the message, and more.
+
+3. **Handler**: Handlers send the LogRecord to the required output destination, like the console or a file. Handler is a base for subclasses like StreamHandler, FileHandler, SMTPHandler, HTTPHandler, and more. These subclasses send the logging outputs to corresponding destinations, like sys.stdout or a disk file.
+
+4. **Formatter**: This is where you specify the format of the output by specifying a string format that lists out the attributes that the output should contain.
+
+Again, unlike the root logger, a custom logger can’t be configured using 
+basicConfig(). You have to configure it using Handlers and Formatters.
+
+# Using Handlers
+Handlers come into action when you want to configure your own loggers to send
+the log to multiple places. Handlers send the log messages to configured 
+destinations which can also include your email using [SMTP](https://github.com/
+Alexmhack/python_intermediate)
+
+**custom_logger.py**
+```
+import logging
+
+# create a custom logger
+logger = logging.getLogger(__name__)
+```
+
+Just like we did before, create a custom logger using ```getLogger``` and pass it
+the ```__name__``` keyword that python assigns with the file name. Which means
+we are giving our logger the name of the file.
