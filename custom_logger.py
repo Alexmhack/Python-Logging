@@ -14,3 +14,6 @@ f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message
 
 c_handler.setFormatter(c_format)
 f_format.setFormatter(f_format)
+
+logger.addHandler(c_handler)
+logger.addHandler(f_handler)
